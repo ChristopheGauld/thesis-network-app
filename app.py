@@ -203,9 +203,9 @@ def dynamical_tab() -> None:
         predisposition_l = st.slider("Prédisposition L", 0.10, 1.20, float(profile["predisposition_l"]), 0.01, key=f"l_{profile_name}")
         sensitivity_s = st.slider("Sensibilité environnementale S", 2.0, 12.0, float(profile["environmental_sensitivity"]), 0.1, key=f"s_{profile_name}")
         noise = st.slider("Intensité du bruit ζ(t)", 0.0, 0.50, 0.0, 0.05)
-        duration = st.slider("Durée simulée (jours)", 180, 1500, 800, 20)
-        x0 = st.slider("Intensité symptomatique initiale x", 0.0, 2.0, 0.0, 0.05)
-        y0 = st.slider("Potentiation initiale y", 0.0, 2.0, 0.10, 0.05)
+        duration = st.slider("Durée simulée (jours)", 30, 600, 180, 10)
+        x0 = st.slider("Intensité symptomatique initiale x", 0.0, 10.0, 0.0, 0.10)
+        y0 = st.slider("Potentiation initiale y", 0.0, 10.0, 0.10, 0.10)
         params = ModelParameters(
             r_b=r_b,
             predisposition_l=predisposition_l,
