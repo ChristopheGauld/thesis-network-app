@@ -1,4 +1,4 @@
-"""Simulation utilities for the pedagogical X–Y–Z dynamical system."""
+"""Dynamical system discussed in the computational psychiatry project."""
 
 from __future__ import annotations
 
@@ -9,65 +9,94 @@ import numpy as np
 
 @dataclass(frozen=True)
 class ModelParameters:
-    coupling_yx: float = 1.15
-    coupling_zy: float = 0.95
-    feedback_xy: float = 0.35
-    feedback_xz: float = 0.20
-    feedback_yz: float = 0.30
-    decay_x: float = 0.85
-    decay_y: float = 0.75
-    decay_z: float = 0.65
-    nonlinearity: float = 0.12
-    external_input: float = 0.20
-    tau_x: float = 1.00
-    tau_y: float = 0.82
-    tau_z: float = 0.62
+    """Parameters reported in *Dynamical Systems for Computational Psychiatry*."""
+
+    tau_x: float = 14.0
+    tau_y: float = 14.0
+    tau_z: float = 1.0
+    tau_f: float = 720.0
+    s_max: float = 10.0
+    r_s: float = 1.0
+    r_b: float = 1.04
+    lambda_s: float = 0.1
+    lambda_b: float = 0.05
+    p_max: float = 10.0
+    predisposition_l: float = 0.2
+    lambda_f: float = 1.0
+    environmental_sensitivity: float = 4.0
+    alpha: float = 0.5
+    beta: float = 0.5
 
 
-def derivatives(state: np.ndarray, params: ModelParameters) -> np.ndarray:
-    """Return derivatives for X=symptom, Y=mechanism, Z=context/intervention."""
-    x, y, z = state
-    cubic = params.nonlinearity
-    dx = params.tau_x * (
-        params.coupling_yx * y - params.decay_x * x - cubic * x**3
+CLINICAL_PROFILES = {
+    "Situation saine": dict(r_b=1.04, predisposition_l=0.20, environmental_sensitivity=4.0),
+    "Spectre de la schizophrénie": dict(r_b=0.904, predisposition_l=0.20, environmental_sensitivity=4.0),
+    "Trouble bipolaire à cycles rapides": dict(r_b=1.04, predisposition_l=1.01, environmental_sensitivity=10.0),
+    "Deuil complexe persistant": dict(r_b=1.00, predisposition_l=0.60, environmental_sensitivity=4.5),
+}
+
+
+def derivatives(
+    state: np.ndarray,
+    params: ModelParameters,
+    zeta: float = 1.0,
+) -> np.ndarray:
+    """Return the four derivatives from equations (1)-(4) of the project."""
+    x, y, z, slow_f = state
+    symptom_drive = params.s_max / (
+        1.0 + np.exp(np.clip((params.r_s - y) / params.lambda_s, -60, 60))
     )
-    dy = params.tau_y * (
-        params.coupling_zy * z
-        + params.feedback_xy * x
-        - params.decay_y * y
-        - cubic * y**3
+    potentiation_drive = params.p_max / (
+        1.0 + np.exp(np.clip((params.r_b - y) / params.lambda_b, -60, 60))
     )
-    dz = params.tau_z * (
-        params.external_input
-        + params.feedback_xz * x
-        + params.feedback_yz * y
-        - params.decay_z * z
-        - cubic * z**3
-    )
-    return np.array([dx, dy, dz], dtype=float)
+    dx = (symptom_drive - x) / params.tau_x
+    dy = (
+        potentiation_drive
+        + slow_f * params.predisposition_l
+        - x * y
+        - z
+    ) / params.tau_y
+    dz = (
+        params.environmental_sensitivity
+        * (params.alpha * x + params.beta * y)
+        * zeta
+        - z
+    ) / params.tau_z
+    df = (y - params.lambda_f * slow_f) / params.tau_f
+    return np.array([dx, dy, dz, df], dtype=float)
 
 
-def _rk4_step(state: np.ndarray, dt: float, params: ModelParameters) -> np.ndarray:
-    k1 = derivatives(state, params)
-    k2 = derivatives(state + dt * k1 / 2, params)
-    k3 = derivatives(state + dt * k2 / 2, params)
-    k4 = derivatives(state + dt * k3, params)
+def _rk4_step(
+    state: np.ndarray,
+    dt: float,
+    params: ModelParameters,
+    zeta: float,
+) -> np.ndarray:
+    k1 = derivatives(state, params, zeta)
+    k2 = derivatives(state + dt * k1 / 2, params, zeta)
+    k3 = derivatives(state + dt * k2 / 2, params, zeta)
+    k4 = derivatives(state + dt * k3, params, zeta)
     return state + dt * (k1 + 2 * k2 + 2 * k3 + k4) / 6
 
 
 def simulate(
     params: ModelParameters,
-    initial_state: tuple[float, float, float] = (0.25, 0.20, 0.15),
-    duration: float = 24.0,
-    steps: int = 600,
+    initial_state: tuple[float, float, float, float] = (0.0, 0.1, 0.0, 0.0),
+    duration: float = 800.0,
+    steps: int = 2400,
+    noise_strength: float = 0.0,
+    seed: int = 42,
 ) -> tuple[np.ndarray, np.ndarray]:
-    """Integrate the system with a deterministic fourth-order Runge–Kutta method."""
+    """Integrate the reported model; ``noise_strength`` controls Gaussian zeta(t)."""
     if duration <= 0 or steps < 2:
         raise ValueError("duration must be positive and steps must be at least 2")
     time = np.linspace(0.0, duration, steps)
-    states = np.zeros((steps, 3), dtype=float)
+    states = np.zeros((steps, 4), dtype=float)
     states[0] = np.asarray(initial_state, dtype=float)
     dt = time[1] - time[0]
+    rng = np.random.default_rng(seed)
     for index in range(1, steps):
-        states[index] = _rk4_step(states[index - 1], dt, params)
+        zeta = 1.0 + noise_strength * rng.normal()
+        states[index] = _rk4_step(states[index - 1], dt, params, zeta)
+        states[index, :2] = np.maximum(states[index, :2], 0.0)
     return time, states

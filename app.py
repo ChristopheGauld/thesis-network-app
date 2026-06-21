@@ -1,19 +1,18 @@
 from pathlib import Path
 
-import numpy as np
 import pandas as pd
 import plotly.graph_objects as go
 import streamlit as st
 
 from content import LIMITS, PRINCIPLES, STUDIES
-from model import ModelParameters, simulate
+from model import CLINICAL_PROFILES, ModelParameters, simulate
 
 
 ROOT = Path(__file__).parent
 ASSETS = ROOT / "assets"
 
 st.set_page_config(
-    page_title="Sémiologie relationnelle · Thèse de C. Gauld",
+    page_title="Sémiologie et réseaux · Thèse de C. Gauld",
     page_icon="◉",
     layout="wide",
     initial_sidebar_state="collapsed",
@@ -126,23 +125,14 @@ def overview_tab() -> None:
 
 def methodology_tab() -> None:
     st.markdown("## Résultats méthodologiques")
-    st.caption("Ce que chaque dispositif rend visible — et ce qu’il ne permet pas de conclure.")
     rows = [
         ["Réseau statique comparatif", "Structure et centralité", "35 808 × 39 variables", "Comparaisons âge / sexe", "Pas de causalité individuelle"],
         ["mlVAR dynamique", "Ordre temporel intra-individuel", "8 260 EMA / 211 patients", "Temporel, contemporain, interindividuel", "Fenêtres courtes et sélection"],
         ["Network Outcome Analysis", "Entrée symptomatique vers l’issue", "136 patients × 23 items", "Issue thérapeutique intégrée au réseau", "Association directe ≠ mécanisme"],
         ["Réseau hybride", "Pont sémiologie–SEEG", "42 patients / 469 crises", "23 signes + 9 régions", "Robustesse faible (CS ≈ 0,05)"],
     ]
-    frame = pd.DataFrame(rows, columns=["Dispositif", "Question", "Échelle", "Apport", "Limite"])
+    frame = pd.DataFrame(rows, columns=["Méthode", "Question", "Échelle", "Apport", "Limite"])
     st.dataframe(frame, hide_index=True, width="stretch")
-
-    left, right = st.columns([1.05, .95], gap="large")
-    with left:
-        st.markdown("### Du nœud à la trajectoire")
-        st.image(ASSETS / "figure_06_trouble_dynamique.png", caption="Figure 6 — Développement temporel d’un trouble psychiatrique selon la théorie des réseaux.", width="stretch")
-    with right:
-        st.markdown("### Le traitement dans le réseau")
-        st.image(ASSETS / "figure_15_intervention_reseau.png", caption="Figure 15 — Évolution d’un réseau sous intervention (figure originale de la thèse).", width="stretch")
 
     st.markdown("### Lecture responsable")
     for limit in LIMITS:
@@ -170,57 +160,63 @@ def clinical_tab() -> None:
                 st.markdown(study_card(study), unsafe_allow_html=True)
 
     st.markdown("### Figures cliniques principales")
-    gallery = st.tabs(["Catatonie · NOA", "Catatonie · groupes", "Épileptologie"])
+    gallery = st.tabs(["Sommeil", "Addictologie", "Catatonie", "Épileptologie"])
     with gallery[0]:
-        st.image(ASSETS / "figure_18_catatonie_noa.png", caption="Figure 18 — L’immobilité/stupeur est l’unique connexion directe avec la réponse aux benzodiazépines.", width="stretch")
+        st.image(ASSETS / "figure_07_sleep_sex_networks.png", caption="Figure 7 — Réseaux du sommeil selon le sexe : femmes (A) et hommes (B).", width="stretch")
+        st.image(ASSETS / "figure_08_sleep_age_networks.png", caption="Figure 8 — Réseaux du sommeil selon l’âge : 18–30 ans (A), 31–45 ans (B), 46–55 ans (C), > 55 ans (D).", width="stretch")
     with gallery[1]:
-        c1, c2 = st.columns(2)
-        c1.image(ASSETS / "figure_16_catatonie_non_repondeurs.png", caption="Figure 16 — Non-répondeurs (n = 76).", width="stretch")
-        c2.image(ASSETS / "figure_17_catatonie_repondeurs.png", caption="Figure 17 — Répondeurs (n = 60).", width="stretch")
+        st.image(ASSETS / "figure_12_addiction_simple_networks.png", caption="Figure 12 — Réseaux simplifiés : contemporain, temporel et interindividuel.", width="stretch")
+        st.image(ASSETS / "figure_13_addiction_full_networks.png", caption="Figure 13 — Réseaux complets à six variables : contemporain, temporel et interindividuel.", width="stretch")
     with gallery[2]:
+        c1, c2 = st.columns(2)
+        c1.image(ASSETS / "figure_16_catatonie_non_repondeurs.png", caption="Figure 16 — Non-répondeurs au lorazépam (n = 76).", width="stretch")
+        c2.image(ASSETS / "figure_17_catatonie_repondeurs.png", caption="Figure 17 — Répondeurs au lorazépam (n = 60).", width="stretch")
+        st.image(ASSETS / "figure_18_catatonie_noa.png", caption="Figure 18 — Network Outcome Analysis : connexion directe entre immobilité/stupeur et réponse aux benzodiazépines.", width="stretch")
+    with gallery[3]:
         st.image(ASSETS / "figure_20_reseau_semiologique.png", caption="Figure 20 — Réseau sémiologique des crises préfrontales (N = 42).", width="stretch")
+        st.image(ASSETS / "figure_21_epilepsy_hybrid_network.png", caption="Figure 21 — Réseau hybride associant caractéristiques sémiologiques et activité cérébrale (N = 42).", width="stretch")
 
 
 def dynamical_tab() -> None:
     st.markdown("## Modèle clinique computationnel")
     st.markdown(
         '<div class="note">Simulation pédagogique du cadre formel discuté dans la thèse. '
-        "Les fonctions utilisées ici illustrent un système non linéaire couplé ; elles ne sont pas ajustées aux données empiriques.</div>",
+        "Elle emploie les quatre équations du travail <i>Dynamical Systems for Computational Psychiatry</i> ; le modèle reste qualitatif et non ajusté aux données empiriques.</div>",
         unsafe_allow_html=True,
     )
-    st.markdown("""
-    <div class="equation">
-    dX/dt = f(X,Y) &nbsp;&nbsp;·&nbsp;&nbsp; dY/dt = g(Y,Z) &nbsp;&nbsp;·&nbsp;&nbsp; dZ/dt = h(Z,Y,X)
-    </div>
-    """, unsafe_allow_html=True)
-    st.caption("X = symptômes observables · Y = mécanismes internes · Z = environnement ou intervention")
+    st.latex(r"""
+    \begin{aligned}
+    \tau_x\frac{dx}{dt} &= \frac{S_{max}}{1+\exp\!\left(\frac{R_s-y}{\lambda_s}\right)}-x \\
+    \tau_y\frac{dy}{dt} &= \frac{P}{1+\exp\!\left(\frac{R_b-y}{\lambda_b}\right)}+fL-xy-z \\
+    \tau_z\frac{dz}{dt} &= S(\alpha x+\beta y)\,\zeta(t)-z \\
+    \tau_f\frac{df}{dt} &= y-\lambda_f f
+    \end{aligned}
+    """)
+    st.caption("x = intensité symptomatique · y = état interne / potentiation · z = environnement perçu · f = fluctuations lentes des facteurs prédisposants")
 
     controls, chart = st.columns([.32, .68], gap="large")
     with controls:
         st.markdown("### Paramètres")
-        external = st.slider("Entrée externe / intervention", -1.0, 1.0, 0.20, 0.05)
-        y_to_x = st.slider("Influence Y → X", 0.0, 2.0, 1.15, 0.05)
-        z_to_y = st.slider("Influence Z → Y", 0.0, 2.0, 0.95, 0.05)
-        feedback = st.slider("Rétroactions du système", 0.0, 1.0, 0.35, 0.05)
-        nonlinearity = st.slider("Non-linéarité / saturation", 0.01, 0.40, 0.12, 0.01)
-        x0 = st.slider("Symptôme initial X", -1.0, 2.0, 0.25, 0.05)
-        y0 = st.slider("Mécanisme initial Y", -1.0, 2.0, 0.20, 0.05)
-        z0 = st.slider("Contexte initial Z", -1.0, 2.0, 0.15, 0.05)
+        profile_name = st.selectbox("Profil qualitatif", list(CLINICAL_PROFILES))
+        profile = CLINICAL_PROFILES[profile_name]
+        r_b = st.slider("Seuil interne Rᵦ", 0.88, 1.08, float(profile["r_b"]), 0.002, key=f"rb_{profile_name}")
+        predisposition_l = st.slider("Prédisposition L", 0.10, 1.20, float(profile["predisposition_l"]), 0.01, key=f"l_{profile_name}")
+        sensitivity_s = st.slider("Sensibilité environnementale S", 2.0, 12.0, float(profile["environmental_sensitivity"]), 0.1, key=f"s_{profile_name}")
+        noise = st.slider("Intensité du bruit ζ(t)", 0.0, 0.50, 0.0, 0.05)
+        duration = st.slider("Durée simulée (jours)", 180, 1500, 800, 20)
+        x0 = st.slider("Intensité symptomatique initiale x", 0.0, 2.0, 0.0, 0.05)
+        y0 = st.slider("Potentiation initiale y", 0.0, 2.0, 0.10, 0.05)
         params = ModelParameters(
-            coupling_yx=y_to_x,
-            coupling_zy=z_to_y,
-            feedback_xy=feedback,
-            feedback_xz=feedback * 0.65,
-            feedback_yz=feedback * 0.85,
-            nonlinearity=nonlinearity,
-            external_input=external,
+            r_b=r_b,
+            predisposition_l=predisposition_l,
+            environmental_sensitivity=sensitivity_s,
         )
-        time, states = simulate(params, (x0, y0, z0))
+        time, states = simulate(params, (x0, y0, 0.0, 0.0), duration=duration, steps=max(1200, duration * 3), noise_strength=noise)
     with chart:
         fig = go.Figure()
-        for index, (name, color) in enumerate([("X · symptôme", "#2DE2E6"), ("Y · mécanisme", "#FF4FD8"), ("Z · contexte / traitement", "#A8FF60")]):
+        for index, (name, color) in enumerate([("x · symptômes", "#2DE2E6"), ("y · potentiation", "#FF4FD8"), ("z · environnement perçu", "#A8FF60"), ("f · fluctuations lentes", "#9B8CFF")]):
             fig.add_trace(go.Scatter(x=time, y=states[:, index], name=name, mode="lines", line=dict(color=color, width=3)))
-        fig.update_xaxes(title="Temps")
+        fig.update_xaxes(title="Temps (jours)")
         fig.update_yaxes(title="État du système")
         st.plotly_chart(plot_theme(fig, 450), width="stretch", config={"displayModeBar": False})
 
@@ -232,31 +228,27 @@ def dynamical_tab() -> None:
         phase.update_layout(
             height=480, margin=dict(l=0, r=0, t=30, b=0),
             paper_bgcolor="rgba(0,0,0,0)", font=dict(color="#bdbdc8"),
-            scene=dict(bgcolor="#09090d", xaxis_title="Z · contexte", yaxis_title="Y · mécanisme", zaxis_title="X · symptôme", xaxis=dict(gridcolor="#24242d"), yaxis=dict(gridcolor="#24242d"), zaxis=dict(gridcolor="#24242d")),
+            scene=dict(bgcolor="#09090d", xaxis_title="z · environnement", yaxis_title="y · potentiation", zaxis_title="x · symptômes", xaxis=dict(gridcolor="#24242d"), yaxis=dict(gridcolor="#24242d"), zaxis=dict(gridcolor="#24242d")),
         )
         st.plotly_chart(phase, width="stretch", config={"displayModeBar": False})
 
-    st.markdown("### Deux régimes dynamiques observés dans la thèse")
-    regime_tabs = st.tabs(["Indices → craving", "Craving → indices", "Espaces de phase empiriques"])
+    st.markdown("### Exemple de deux régimes dynamiques observés dans la thèse")
+    regime_tabs = st.tabs(["Cues → craving", "Craving → cues"])
     with regime_tabs[0]:
         c1, c2 = st.columns([.36, .64])
         c1.image(ASSETS / "figure_25_phase_indices_craving.jpeg", width="stretch")
         c2.image(ASSETS / "figure_25_trajectoires_indices_craving.jpeg", width="stretch")
-        st.caption("Figure 25 — Profil dans lequel les indices précèdent le craving (n = 154).")
+        st.caption("Figure 25 — Profil dans lequel les cues précèdent le craving (n = 154).")
     with regime_tabs[1]:
         c1, c2 = st.columns([.39, .61])
         c1.image(ASSETS / "figure_26_phase_craving_indices.jpeg", width="stretch")
         c2.image(ASSETS / "figure_26_trajectoires_craving_indices.jpeg", width="stretch")
-        st.caption("Figure 26 — Profil dans lequel le craving précède les indices (n = 57).")
-    with regime_tabs[2]:
-        c1, c2 = st.columns(2)
-        c1.image(ASSETS / "figure_24_espace_phase_patient_1.png", caption="Patient 1", width="stretch")
-        c2.image(ASSETS / "figure_24_espace_phase_patient_2.png", caption="Patient 2", width="stretch")
+        st.caption("Figure 26 — Profil dans lequel le craving précède les cues (n = 57).")
 
 
 inject_css()
 st.markdown('<div class="eyebrow">Thèse de doctorat · Christophe Gauld</div>', unsafe_allow_html=True)
-st.markdown('<h1>SÉMIOLOGIE<br><span class="gradient">EN MOUVEMENT</span></h1>', unsafe_allow_html=True)
+st.markdown('<h1>SÉMIOLOGIE<br><span class="gradient">ET RÉSEAUX</span></h1>', unsafe_allow_html=True)
 st.markdown(
     '<div class="hero-sub">Applications cliniques et neuroscientifiques des réseaux de symptômes — '
     "sémiologie, dynamique, intervention et explication.</div>",
@@ -268,7 +260,7 @@ st.markdown(
       <div class="stat"><b>4</b><span>terrains cliniques</span></div>
       <div class="stat"><b>4</b><span>principes organisateurs</span></div>
       <div class="stat"><b>44 246</b><span>participants / observations clés</span></div>
-      <div class="stat"><b>X · Y · Z</b><span>système dynamique couplé</span></div>
+      <div class="stat"><b>x · y · z · f</b><span>système dynamique couplé</span></div>
     </div>
     """,
     unsafe_allow_html=True,

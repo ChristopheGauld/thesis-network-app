@@ -55,5 +55,5 @@ LIMITS = [
     "Centralité : importance statistique ne signifie ni causalité directe ni cible thérapeutique automatique.",
     "Études transversales : elles ne permettent pas d’inférer les dynamiques temporelles.",
     "Réseau hybride en épileptologie : N = 42 et coefficient de stabilité d’environ 0,05.",
-    "Simulation X–Y–Z : démonstration pédagogique, non ajustée aux données cliniques de la thèse.",
+    "Simulation x–y–z–f : équations mécanistes du travail intermédiaire, non ajustées aux données cliniques de la thèse.",
 ]
