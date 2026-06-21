@@ -2,6 +2,8 @@
 
 Résultats principaux de la thèse de Christophe Gauld sur les applications cliniques et neuroscientifiques des réseaux de symptômes.
 
+Lien de l'app : https://tinyurl.com/4kcvv5cx
+
 ## Contenu
 
 - synthèse des quatre études empiriques ;
