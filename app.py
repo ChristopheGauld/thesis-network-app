@@ -94,7 +94,7 @@ def study_card(study: dict) -> str:
 
 def overview_tab() -> None:
     st.markdown(
-        "## Des catégories diagnostiques vers une science relationnelle de la sémiologie : "
+        "### Des catégories diagnostiques vers une science relationnelle de la sémiologie : "
         "décrire les symptômes par leurs relations, leurs trajectoires, leurs réponses aux interventions "
         "et leurs liens avec des mécanismes internes."
     )
