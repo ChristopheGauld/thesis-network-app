@@ -5,7 +5,7 @@ import plotly.graph_objects as go
 import streamlit as st
 
 from content import LIMITS, PRINCIPLES, STUDIES
-from model import CLINICAL_PROFILES, ModelParameters, simulate
+from dynamical_model import CLINICAL_PROFILES, ModelParameters, simulate
 
 
 ROOT = Path(__file__).parent

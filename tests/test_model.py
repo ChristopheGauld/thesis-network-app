@@ -1,7 +1,7 @@
 import numpy as np
 import pytest
 
-from model import ModelParameters, derivatives, simulate
+from dynamical_model import ModelParameters, derivatives, simulate
 
 
 def test_derivatives_are_finite():
