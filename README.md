@@ -1,4 +1,4 @@
-# Sémiologie en mouvement
+# Sémiologie et réseaux
 
 Application Streamlit sombre et interactive présentant les résultats principaux de la thèse de Christophe Gauld sur les applications cliniques et neuroscientifiques des réseaux de symptômes.
 
@@ -7,8 +7,8 @@ Application Streamlit sombre et interactive présentant les résultats principau
 - synthèse des quatre études empiriques ;
 - résultats méthodologiques et limites d’interprétation ;
 - résultats cliniques et figures principales ;
-- onglet dédié au modèle dynamique couplé X–Y–Z ;
-- simulation pédagogique paramétrable et espaces de phase.
+- onglet dédié au modèle dynamique couplé x–y–z–f ;
+- simulation paramétrable des quatre équations discutées dans *Dynamical Systems for Computational Psychiatry* et espaces de phase.
 
 Le manuscrit et les données individuelles ne sont pas inclus dans le dépôt.
 
