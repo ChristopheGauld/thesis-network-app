@@ -1,6 +1,6 @@
 # Sémiologie et réseaux
 
-Résultats principaux de la thèse de Christophe Gauld sur les applications cliniques et neuroscientifiques des réseaux de symptômes.
+Résultats principaux de ma thèse (Université de Bordeaux) sur les applications cliniques et neuroscientifiques des réseaux de symptômes
 
 Lien de l'app : https://tinyurl.com/4kcvv5cx
 
