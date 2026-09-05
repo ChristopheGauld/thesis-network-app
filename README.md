@@ -6,11 +6,11 @@ Lien de l'app : https://tinyurl.com/4kcvv5cx
 
 ## Contenu
 
-- synthèse des quatre études empiriques ;
-- résultats méthodologiques et limites d’interprétation ;
-- résultats cliniques et figures principales ;
-- onglet dédié au modèle dynamique couplé x–y–z–f ;
-- simulation paramétrable des quatre équations discutées dans *Dynamical Systems for Computational Psychiatry* et espaces de phase.
+- synthèse des quatre études empiriques 
+- résultats méthodologiques et limites d’interprétation 
+- résultats cliniques et figures principales 
+- onglet dédié au modèle dynamique couplé x–y–z–f 
+- simulation paramétrable des quatre équations discutées dans *Dynamical Systems for Computational Psychiatry* et espaces de phase
 
 
 ## Données
