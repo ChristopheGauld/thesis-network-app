@@ -12,7 +12,7 @@ ROOT = Path(__file__).parent
 ASSETS = ROOT / "assets"
 
 st.set_page_config(
-    page_title="Sémiologie et réseaux · Thèse de C. Gauld",
+    page_title="Sémiologie et réseaux – thèse de neurosciences de C. Gauld",
     page_icon="◉",
     layout="wide",
     initial_sidebar_state="collapsed",
@@ -96,7 +96,7 @@ def overview_tab() -> None:
     st.markdown(
         "### Des catégories diagnostiques vers une science relationnelle de la sémiologie : "
         "décrire les symptômes par leurs relations, leurs trajectoires, leurs réponses aux interventions "
-        "et leurs liens avec des mécanismes internes."
+        "et leurs liens avec des mécanismes internes"
     )
     columns = st.columns(4)
     for column, study in zip(columns, STUDIES):
@@ -127,8 +127,8 @@ def methodology_tab() -> None:
     rows = [
         ["Réseau statique comparatif", "Structure et centralité", "35 808 × 39 variables", "Comparaisons âge / sexe", "Pas de causalité individuelle"],
         ["mlVAR dynamique", "Ordre temporel intra-individuel", "8 260 EMA / 211 patients", "Temporel, contemporain, interindividuel", "Fenêtres courtes et sélection"],
-        ["Network Outcome Analysis", "Entrée symptomatique vers l’issue", "136 patients × 23 items", "Issue thérapeutique intégrée au réseau", "Association directe ≠ mécanisme"],
-        ["Réseau hybride", "Pont sémiologie–SEEG", "42 patients / 469 crises", "23 signes + 9 régions", "Robustesse faible (CS ≈ 0,05)"],
+        ["Network Outcome Analysis", "Correspondance entre symptôme et outcome", "136 patients et 23 items", "Outcome thérapeutique intégrée au réseau", "Association directe ≠ mécanisme"],
+        ["Réseau hybride", "Pont sémiologie–SEEG", "42 patients / 469 crises", "23 signes et 9 régions", "Robustesse relativement faible"],
     ]
     frame = pd.DataFrame(rows, columns=["Méthode", "Question", "Échelle", "Apport", "Limite"])
     st.dataframe(frame, hide_index=True, width="stretch")
@@ -180,7 +180,7 @@ def dynamical_tab() -> None:
     st.markdown("## Modèle clinique computationnel")
     st.markdown(
         '<div class="note">Simulation pédagogique du cadre formel discuté dans la thèse. '
-        "Elle emploie les quatre équations du travail <i>Dynamical Systems for Computational Psychiatry</i> ; le modèle reste qualitatif et non ajusté aux données empiriques.</div>",
+        "Elle emploie les quatre équations du travail <i>Dynamical Systems for Computational Psychiatry</i> ; le modèle reste qualitatif et non ajusté aux données empiriques</div>",
         unsafe_allow_html=True,
     )
     st.latex(r"""
