@@ -9,7 +9,7 @@ import numpy as np
 
 @dataclass(frozen=True)
 class ModelParameters:
-    """Parameters reported in *Dynamical Systems for Computational Psychiatry*."""
+    """Parameters reported in *Dynamical Systems for Computational Psychiatry*"""
 
     tau_x: float = 14.0
     tau_y: float = 14.0
