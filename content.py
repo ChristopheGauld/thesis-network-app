@@ -18,7 +18,7 @@ STUDIES = [
         "sample": "8 260",
         "method": "211 patients · EMA · mlVAR · 14 jours",
         "result": "Le craving à T0 prédit l’usage à T1 (r = 0,10) ; l’auto-efficacité joue un rôle modérateur indépendant",
-        "clinical": "Repérer les moteurs dynamiques à court terme plutôt que lire uniquement des "états moyens"",
+        "clinical": "Repérer les moteurs dynamiques à court terme plutôt que lire uniquement des "états moyens",
         "accent": "#FF4FD8",
     },
     {
